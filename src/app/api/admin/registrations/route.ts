@@ -50,9 +50,6 @@ export async function POST(request: Request) {
   if (findError || !application) return NextResponse.json({ error: 'Application not found.' }, { status: 404 });
   if (application.status !== 'pending') return NextResponse.json({ error: 'Application has already been reviewed.' }, { status: 409 });
 
-  if (decision === 'approve') {
-  }
-
   const { error: updateError } = await context.admin.schema('FLT').from('registration_applications')
     .update({
       status: decision === 'approve' ? 'approved' : 'rejected',
