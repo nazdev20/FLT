@@ -14,7 +14,7 @@ export async function POST(request: Request) {
   const password = String(form.get('password') || '');
   const image = form.get('image');
 
-  if (username.length < 2 || username.length > 60 || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email) ||
+  if (username.length < 2 || username.length > 60 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ||
       password.length < 8 || !(image instanceof File)) {
     return NextResponse.json({ error: 'Provide a valid username, email, password (8+ characters), and image.' }, { status: 400 });
   }
