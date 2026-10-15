@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Battle, BattleSide, BattlePoolSummary } from '../types/database';
-import { FLTService } from '../lib/flt-service';
-import { QRCodeDisplay } from '../components/QRCodeDisplay';
-import { formatPHP } from '../lib/pari-mutuel';
+import { Battle, BattleSide, BattlePoolSummary } from '../../types/database';
+import { FLTService } from '../../lib/flt-service';
+import { QRCodeDisplay } from '../../components/QRCodeDisplay';
+import { formatPHP } from '../../lib/pari-mutuel';
 import {
   ArrowLeft,
   Clock,

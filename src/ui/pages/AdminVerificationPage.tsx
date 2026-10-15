@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { BetPaymentSubmission } from '../types/database';
-import { FLTService } from '../lib/flt-service';
-import { formatPHP } from '../lib/pari-mutuel';
+import { BetPaymentSubmission } from '../../types/database';
+import { FLTService } from '../../lib/flt-service';
+import { formatPHP } from '../../lib/pari-mutuel';
 import {
   ShieldAlert,
   CheckCircle2,

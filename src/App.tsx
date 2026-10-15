@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Battle, BattleSide } from './types/database';
 import { FLTService, localRepo } from './lib/flt-service';
 import { Navbar, NavTab } from './components/Navbar';
-import { BattleListPage } from './pages/BattleListPage';
-import { BattleDetailPage } from './pages/BattleDetailPage';
-import { MyBetsPage } from './pages/MyBetsPage';
-import { AdminDashboardPage } from './pages/AdminDashboardPage';
-import { AdminVerificationPage } from './pages/AdminVerificationPage';
-import { AdminBattleManagementPage } from './pages/AdminBattleManagementPage';
-import { UserProfilePage } from './pages/UserProfilePage';
+import { BattleListPage } from './ui/pages/BattleListPage';
+import { BattleDetailPage } from './ui/pages/BattleDetailPage';
+import { MyBetsPage } from './ui/pages/MyBetsPage';
+import { AdminDashboardPage } from './ui/pages/AdminDashboardPage';
+import { AdminVerificationPage } from './ui/pages/AdminVerificationPage';
+import { AdminBattleManagementPage } from './ui/pages/AdminBattleManagementPage';
+import { UserProfilePage } from './ui/pages/UserProfilePage';
 import {
   Shield,
   Clock,

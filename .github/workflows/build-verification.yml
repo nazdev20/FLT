@@ -1,0 +1,33 @@
+name: Build verification
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install
+      - run: bun run build
+
+      - name: Diagnose generated route types
+        if: always()
+        run: |
+          echo "Tracked route files:"
+          find app src -type f \( -name 'page.*' -o -name 'layout.*' \) -print 2>/dev/null || true
+          echo "Generated references:"
+          grep -R -n "src/app/page.js" .next/types .next/server 2>/dev/null || true
+          echo "Validator file:"
+          sed -n "1,120p" .next/types/validator.ts 2>/dev/null || true
+          echo "App paths manifest:"
+          cat .next/server/app-paths-manifest.json 2>/dev/null || true
+          echo "Build manifest:"
+          cat .next/build-manifest.json 2>/dev/null || true
+          echo "Generated type files:"
+          find .next/types -maxdepth 4 -type f -print 2>/dev/null | head -100

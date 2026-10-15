@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Battle, BattleSide } from '../types/database';
-import { FLTService } from '../lib/flt-service';
-import { formatPHP } from '../lib/pari-mutuel';
+import { Battle, BattleSide } from '../../types/database';
+import { FLTService } from '../../lib/flt-service';
+import { formatPHP } from '../../lib/pari-mutuel';
 import {
   Swords,
   Flame,

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Profile } from '../types/database';
+import { Profile } from '../../types/database';
 import {
   FLTService,
   getSavedConfig,
   saveSupabaseConfig,
   localRepo,
-} from '../lib/flt-service';
+} from '../../lib/flt-service';
 import {
   User as UserIcon,
   Shield,

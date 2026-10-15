@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FLTService } from '../lib/flt-service';
-import { formatPHP } from '../lib/pari-mutuel';
+import { FLTService } from '../../lib/flt-service';
+import { formatPHP } from '../../lib/pari-mutuel';
 import {
   Shield,
   Clock,

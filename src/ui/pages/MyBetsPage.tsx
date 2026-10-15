@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Bet } from '../types/database';
-import { FLTService } from '../lib/flt-service';
-import { formatPHP } from '../lib/pari-mutuel';
+import { Bet } from '../../types/database';
+import { FLTService } from '../../lib/flt-service';
+import { formatPHP } from '../../lib/pari-mutuel';
 import {
   Clock,
   CheckCircle2,
