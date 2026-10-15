@@ -24,10 +24,6 @@ export async function POST(request: Request) {
 
   // Password is validated only; it is never stored before approval.
   const client = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false }, db: { schema: 'FLT' } });
-  const { data: existing, error: lookupError } = await client.from('registration_applications').select('id').eq('email', email).maybeSingle();
-  if (lookupError) return NextResponse.json({ error: lookupError.message }, { status: 400 });
-  if (existing) return NextResponse.json({ error: 'An application already exists for this email.' }, { status: 409 });
-
   const ext = image.type === 'image/png' ? 'png' : image.type === 'image/webp' ? 'webp' : 'jpg';
   const path = `${crypto.randomUUID()}.${ext}`;
   const { error: uploadError } = await client.storage.from('registration-proofs').upload(path, await image.arrayBuffer(), { contentType: image.type, upsert: false });
@@ -36,7 +32,7 @@ export async function POST(request: Request) {
   const { error: insertError } = await client.from('registration_applications').insert({ username, email, image_path: path });
   if (insertError) {
     await client.storage.from('registration-proofs').remove([path]);
-    return NextResponse.json({ error: insertError.code === '23505' ? 'An application already exists for this email.' : insertError.message }, { status: 400 });
+    return NextResponse.json({ error: insertError.code === '23505' ? 'An application already exists for this email.' : 'Unable to save the application. Please try again.' }, { status: insertError.code === '23505' ? 409 : 400 });
   }
   return NextResponse.json({ message: 'Application submitted for admin review. No Auth account has been created yet.' }, { status: 201 });
 }
