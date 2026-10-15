@@ -8,14 +8,11 @@ import {
   BattleSide,
 } from '../types/database';
 
-// Configuration keys from Vite env (supports both NEXT_PUBLIC_ and VITE_ prefixes)
-const ENV_URL =
-  (import.meta as any).env?.NEXT_PUBLIC_SUPABASE_URL ||
-  (import.meta as any).env?.VITE_SUPABASE_URL ||
-  '';
+// Next.js exposes only NEXT_PUBLIC_* variables to browser code.
+const ENV_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const ENV_KEY =
-  (import.meta as any).env?.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  (import.meta as any).env?.VITE_SUPABASE_ANON_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
   '';
 
 const CONFIG_STORAGE_KEY = 'flt_supabase_config_override';
