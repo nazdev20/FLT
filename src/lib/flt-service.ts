@@ -403,21 +403,20 @@ export const FLTService = {
   // 1. Fetch Battles from FLT.battles
   async fetchBattles(): Promise<Battle[]> {
     const client = getClient();
-    if (client) {
-      try {
-        const { data, error } = await client
-          .schema('FLT')
-          .from('battles')
-          .select('*')
-          .order('starts_at', { ascending: true });
-
-        if (error) throw error;
-        if (data) return data as Battle[];
-      } catch (err) {
-        console.warn('Error fetching FLT.battles from Supabase, using local state:', err);
-      }
+    if (!client) {
+      throw new Error('Supabase is not configured. Configure the FLT Supabase URL and public key before loading battles.');
     }
-    return localRepo.getState().battles;
+
+    const { data, error } = await client
+      .schema('FLT')
+      .from('battles')
+      .select('*')
+      .order('starts_at', { ascending: true });
+
+    if (error) {
+      throw new Error(`Unable to load battles from FLT.battles: ${error.message}`);
+    }
+    return (data || []) as Battle[];
   },
 
   // 2. Fetch Single Battle with calculations
@@ -513,7 +512,9 @@ export const FLTService = {
       }
     }
 
-    // Local fallback implementation
+    throw new Error('Supabase is not configured. Bet submissions must be saved to FLT through the database; local mock submissions are disabled.');
+
+    /* Local fallback implementation intentionally disabled.
     const state = localRepo.getState();
     const { user } = await this.getCurrentUser();
     if (!user) throw new Error('Authentication required.');
@@ -579,6 +580,7 @@ export const FLTService = {
     });
 
     return { bet_id: betId, payment_id: paymentId, status: 'pending_verification' };
+    */
   },
 
   // 5. Fetch My Bets & Payment Submissions
