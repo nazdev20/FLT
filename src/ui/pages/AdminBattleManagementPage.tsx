@@ -25,12 +25,8 @@ export const AdminBattleManagementPage: React.FC = () => {
   const [title, setTitle] = useState('');
   const [emceeA, setEmceeA] = useState('');
   const [emceeB, setEmceeB] = useState('');
-  const [photoA, setPhotoA] = useState(
-    'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=400&auto=format&fit=crop&q=80'
-  );
-  const [photoB, setPhotoB] = useState(
-    'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=80'
-  );
+  const [photoA, setPhotoA] = useState('');
+  const [photoB, setPhotoB] = useState('');
 
   const defaultStart = new Date(Date.now() + 3 * 3600 * 1000).toISOString().slice(0, 16);
   const [startsAt, setStartsAt] = useState(defaultStart);
@@ -80,6 +76,8 @@ export const AdminBattleManagementPage: React.FC = () => {
       setTitle('');
       setEmceeA('');
       setEmceeB('');
+      setPhotoA('');
+      setPhotoB('');
       await loadBattles();
     } catch (err: any) {
       setCreateError(err?.message || 'FLT.create_battle failed');
@@ -299,10 +297,12 @@ export const AdminBattleManagementPage: React.FC = () => {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-[11px] font-bold text-zinc-400 mb-1">
-                    Side A Photo URL
+                    Side A Photo URL (required)
                   </label>
                   <input
                     type="url"
+                    required
+                    placeholder="Paste a real image URL"
                     value={photoA}
                     onChange={(e) => setPhotoA(e.target.value)}
                     className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white"
@@ -310,10 +310,12 @@ export const AdminBattleManagementPage: React.FC = () => {
                 </div>
                 <div>
                   <label className="block text-[11px] font-bold text-zinc-400 mb-1">
-                    Side B Photo URL
+                    Side B Photo URL (required)
                   </label>
                   <input
                     type="url"
+                    required
+                    placeholder="Paste a real image URL"
                     value={photoB}
                     onChange={(e) => setPhotoB(e.target.value)}
                     className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-xl text-xs text-white"
