@@ -6,16 +6,15 @@ export const runtime = 'nodejs';
 async function getAdmin(request: Request) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
-  const service = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const token = request.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
-  if (!url || !anon || !service || !token) return null;
+  if (!url || !anon || !token) return null;
 
   const userClient = createClient(url, anon, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data: { user }, error } = await userClient.auth.getUser(token);
   if (error || !user) return null;
-  const admin = createClient(url, service, { auth: { persistSession: false, autoRefreshToken: false } });
-  const { data: profile } = await admin.schema('FLT').from('profiles').select('role').eq('id', user.id).maybeSingle();
-  if (profile?.role !== 'admin') return null;
+  const admin = createClient(url, anon, { auth: { persistSession: false, autoRefreshToken: false }, db: { schema: 'FLT' }, global: { headers: { Authorization: `Bearer ${token}` } } });
+  const { data: profile, error: profileError } = await admin.from('profiles').select('role').eq('id', user.id).maybeSingle();
+  if (profileError || profile?.role !== 'admin') return null;
   return { admin, user };
 }
 
@@ -52,11 +51,6 @@ export async function POST(request: Request) {
   if (application.status !== 'pending') return NextResponse.json({ error: 'Application has already been reviewed.' }, { status: 409 });
 
   if (decision === 'approve') {
-    // Create Auth user only after approval; Supabase sends the secure invite/password-setup email.
-    const { error: inviteError } = await context.admin.auth.admin.inviteUserByEmail(application.email, {
-      data: { username: application.username },
-    });
-    if (inviteError) return NextResponse.json({ error: inviteError.message }, { status: 400 });
   }
 
   const { error: updateError } = await context.admin.schema('FLT').from('registration_applications')
@@ -67,5 +61,5 @@ export async function POST(request: Request) {
       reviewed_at: new Date().toISOString(),
     }).eq('id', id).eq('status', 'pending');
   if (updateError) return NextResponse.json({ error: updateError.message }, { status: 500 });
-  return NextResponse.json({ message: decision === 'approve' ? 'Application approved; invitation sent.' : 'Application declined.' });
+  return NextResponse.json({ message: decision === 'approve' ? 'Application approved. The applicant can now create an account.' : 'Application declined.' });
 }
