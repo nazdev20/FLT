@@ -55,7 +55,7 @@ export default function AdminRegistrationsPage() {
   return <main className="min-h-screen bg-zinc-950 px-4 py-10 text-zinc-100">
     <section className="mx-auto max-w-6xl">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div><p className="text-xs font-bold uppercase tracking-widest text-amber-400">FLT • Admin</p><h1 className="mt-2 text-3xl font-black">Registration review</h1><p className="mt-2 text-sm text-zinc-400">Approve applications to create Auth accounts, or decline them.</p></div>
+        <div><p className="text-xs font-bold uppercase tracking-widest text-amber-400">FLT • Admin</p><h1 className="mt-2 text-3xl font-black">Registration review</h1><p className="mt-2 text-sm text-zinc-400">Approve or decline applications. Approved applicants can then create their own Auth account.</p></div>
         <Link href="/" className="text-sm text-zinc-400 hover:text-white">Back to FLT</Link>
       </div>
       {error && <p role="alert" className="mt-5 rounded-xl bg-rose-950 p-3 text-sm text-rose-300">{error}</p>}
@@ -64,7 +64,7 @@ export default function AdminRegistrationsPage() {
         {apps.map(app => <article key={app.id} className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
           {app.image_url ? <a href={app.image_url} target="_blank" rel="noreferrer"><img src={app.image_url} alt={`Registration proof for ${app.username}`} className="h-64 w-full object-contain bg-zinc-950" /></a> : <div className="flex h-40 items-center justify-center text-sm text-zinc-500">Image unavailable</div>}
           <div className="space-y-3 p-5"><div><h2 className="text-xl font-bold">{app.username}</h2><p className="text-sm text-zinc-400">{app.email}</p></div><p className="text-xs text-zinc-500">Submitted {new Date(app.created_at).toLocaleString()}</p><p className="text-xs uppercase tracking-widest text-amber-400">{app.status}</p>
-            {app.status === 'pending' && <div className="flex gap-3"><button disabled={!!busy} onClick={() => void decide(app, 'approve')} className="flex-1 rounded-xl bg-emerald-500 p-3 font-bold text-zinc-950 disabled:opacity-50">{busy === app.id ? 'Working…' : 'Accept & invite'}</button><button disabled={!!busy} onClick={() => void decide(app, 'reject')} className="flex-1 rounded-xl border border-rose-700 p-3 font-bold text-rose-300 disabled:opacity-50">Decline</button></div>}
+            {app.status === 'pending' && <div className="flex gap-3"><button disabled={!!busy} onClick={() => void decide(app, 'approve')} className="flex-1 rounded-xl bg-emerald-500 p-3 font-bold text-zinc-950 disabled:opacity-50">{busy === app.id ? 'Working…' : 'Approve'}</button><button disabled={!!busy} onClick={() => void decide(app, 'reject')} className="flex-1 rounded-xl border border-rose-700 p-3 font-bold text-rose-300 disabled:opacity-50">Decline</button></div>}
             {app.rejection_reason && <p className="text-sm text-rose-300">Reason: {app.rejection_reason}</p>}
           </div>
         </article>)}
