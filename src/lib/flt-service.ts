@@ -372,6 +372,7 @@ export const FLTService = {
     return submissions.map((d: any) => ({
       ...d,
       battle_title: d.bet?.battle?.title,
+      bet_status: d.bet?.status,
       emcee_a: d.bet?.battle?.emcee_a,
       emcee_b: d.bet?.battle?.emcee_b,
       side: d.bet?.side,
