@@ -51,16 +51,38 @@ export async function POST(request: Request) {
     }
 
     // Verify the webhook payload against PayMongo's API before changing FLT records.
-    const verifyResponse = await fetch(
-      `https://api.paymongo.com/v2/checkout_sessions/${encodeURIComponent(sessionId)}`,
-      {
-        method: 'GET',
-        headers: { Authorization: payMongoBasicAuthorization(secretKey) },
-        cache: 'no-store',
-      }
-    );
+    let verifyResponse: Response;
+    try {
+      verifyResponse = await fetch(
+        `https://api.paymongo.com/v2/checkout_sessions/${encodeURIComponent(sessionId)}`,
+        {
+          method: 'GET',
+          headers: { Authorization: payMongoBasicAuthorization(secretKey) },
+          cache: 'no-store',
+        }
+      );
+    } catch (error) {
+      console.error('PayMongo checkout verification request failed:', {
+        errorType: error instanceof Error ? error.name : 'UnknownError',
+        message: error instanceof Error ? error.message.slice(0, 240) : 'Unknown network error',
+      });
+      return NextResponse.json({ error: 'Could not verify checkout with PayMongo.' }, { status: 502 });
+    }
+
     const verifyJson = await verifyResponse.json().catch(() => null);
     if (!verifyResponse.ok) {
+      const apiErrors = Array.isArray(verifyJson?.errors)
+        ? verifyJson.errors.slice(0, 5).map((apiError: any) => ({
+            code: typeof apiError?.code === 'string' ? apiError.code.slice(0, 100) : undefined,
+            detail: typeof apiError?.detail === 'string' ? apiError.detail.slice(0, 240) : undefined,
+          }))
+        : [];
+
+      console.error('PayMongo checkout verification returned a non-2xx response:', {
+        status: verifyResponse.status,
+        statusText: verifyResponse.statusText,
+        errors: apiErrors,
+      });
       return NextResponse.json({ error: 'Could not verify checkout with PayMongo.' }, { status: 502 });
     }
 
