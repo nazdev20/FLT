@@ -38,6 +38,12 @@ export default function App() {
   const handleNavigation = async (tab: NavTab) => {
     setNotice('');
     if (tab === 'login' || tab === 'battles') { setActiveTab(tab); return; }
+    if (tab === 'my_bets') {
+      const { user, profile } = await FLTService.getCurrentUser();
+      if (!user || !profile) { setNotice('Please sign in to access your account.'); setActiveTab('login'); return; }
+      if (profile.role === 'admin') { setNotice('Admin accounts cannot bet. Use Manage Battles to create and manage battles.'); setActiveTab('admin_battles'); return; }
+      setActiveTab(tab); return;
+    }
     if (tab === 'battle_detail') {
       const { user } = await FLTService.getCurrentUser();
       if (!user) { setNotice('Sign in to continue to your betting workflow.'); setActiveTab('login'); return; }
@@ -67,7 +73,8 @@ export default function App() {
   const handleSignedIn = async () => {
     setNotice('');
     await loadPendingCount();
-    setActiveTab(selectedBattle ? 'battle_detail' : 'battles');
+    const { profile } = await FLTService.getCurrentUser();
+    setActiveTab(profile?.role === 'admin' ? 'admin_battles' : (selectedBattle ? 'battle_detail' : 'battles'));
   };
 
   const handleSignOut = async () => {
