@@ -92,8 +92,10 @@ export function verifyPayMongoSignature(
 
 export function getAppBaseUrl(request: Request) {
   const configured = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || '';
-  let candidate = new URL(request.url).origin;
-  if (configured && !configured.includes('MY_APP_URL')) {
+  const requestOrigin = new URL(request.url).origin;
+  // Always return test-mode Preview payments to the same preview deployment.
+  let candidate = requestOrigin;
+  if (process.env.VERCEL_ENV !== 'preview' && configured && !configured.includes('MY_APP_URL')) {
     try {
       const configuredUrl = new URL(configured);
       if (configuredUrl.protocol === 'https:' || configuredUrl.hostname === 'localhost' || configuredUrl.hostname === '127.0.0.1') {
