@@ -234,6 +234,18 @@ export const BattleDetailPage: React.FC<BattleDetailPageProps> = ({
         </div>
       </div>
 
+      {battle.status === 'settled' && battle.emcee_a_score != null && battle.emcee_b_score != null && (
+        <div className="rounded-3xl border border-emerald-500/30 bg-emerald-500/10 p-5 text-center space-y-2">
+          <div className="text-xs font-black uppercase tracking-wider text-emerald-300">Official Battle Result</div>
+          <div className="grid grid-cols-3 items-center gap-2">
+            <div className="min-w-0"><p className="text-xs text-zinc-300 truncate">{battle.emcee_a}</p><p className="text-2xl font-black text-white">{battle.emcee_a_score}</p></div>
+            <div className="text-xs font-bold text-zinc-400">FINAL SCORE</div>
+            <div className="min-w-0"><p className="text-xs text-zinc-300 truncate">{battle.emcee_b}</p><p className="text-2xl font-black text-white">{battle.emcee_b_score}</p></div>
+          </div>
+          <p className="text-sm font-black text-emerald-300">Winner: {battle.winner_side === 'A' ? battle.emcee_a : battle.emcee_b}</p>
+        </div>
+      )}
+
       {/* STEP 1: CONFIGURE WAGER FORM */}
       {step === 'configure' && (
         <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
