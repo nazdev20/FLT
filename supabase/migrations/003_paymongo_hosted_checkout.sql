@@ -327,7 +327,7 @@ RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = pg_catalog
-AS $
+AS $$
 BEGIN
   IF NEW.payment_status IS DISTINCT FROM OLD.payment_status
      AND COALESCE(auth.role(), '') <> 'service_role' THEN
@@ -344,13 +344,16 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$;
+$$;
 
 DROP TRIGGER IF EXISTS guard_paymongo_payment_status ON "FLT".bet_payment_submissions;
 CREATE TRIGGER guard_paymongo_payment_status
 BEFORE UPDATE OF status, payment_status ON "FLT".bet_payment_submissions
 FOR EACH ROW
 EXECUTE FUNCTION "FLT".guard_paymongo_payment_status();
+
+-- The trigger function is invoked by the trigger only, not through the Data API.
+REVOKE ALL ON FUNCTION "FLT".guard_paymongo_payment_status() FROM PUBLIC, anon, authenticated;
 
 -- Disable the former manual-reference submission path. New bets must use the server route.
 REVOKE ALL ON FUNCTION "FLT".submit_bet_payment(uuid, text, numeric, text, text, text)
