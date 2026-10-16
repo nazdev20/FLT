@@ -316,6 +316,38 @@ BEGIN
 END;
 $$;
 
+-- Do not allow a manual admin review or client-side write to mark an unverified payment paid.
+CREATE OR REPLACE FUNCTION "FLT".guard_paymongo_payment_status()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog
+AS $
+BEGIN
+  IF NEW.payment_status = 'paid' AND OLD.payment_status IS DISTINCT FROM 'paid'
+     AND auth.role() <> 'service_role' THEN
+    RAISE EXCEPTION 'PAYMONGO_VERIFICATION_REQUIRED';
+  END IF;
+  IF NEW.status = 'paid' AND NEW.payment_status <> 'paid' THEN
+    RAISE EXCEPTION 'PAYMONGO_VERIFICATION_REQUIRED';
+  END IF;
+  IF NEW.status = 'approved' AND NEW.payment_status <> 'paid' THEN
+    RAISE EXCEPTION 'PAYMONGO_VERIFICATION_REQUIRED';
+  END IF;
+  RETURN NEW;
+END;
+$;
+
+DROP TRIGGER IF EXISTS guard_paymongo_payment_status ON "FLT".bet_payment_submissions;
+CREATE TRIGGER guard_paymongo_payment_status
+BEFORE UPDATE OF status, payment_status ON "FLT".bet_payment_submissions
+FOR EACH ROW
+EXECUTE FUNCTION "FLT".guard_paymongo_payment_status();
+
+-- Disable the former manual-reference submission path. New bets must use the server route.
+REVOKE ALL ON FUNCTION "FLT".submit_bet_payment(uuid, text, numeric, text, text, text)
+  FROM PUBLIC, anon, authenticated;
+
 REVOKE ALL ON FUNCTION "FLT".create_paymongo_bet(uuid, uuid, text, numeric, text) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION "FLT".confirm_paymongo_bet_payment(text, text, text, bigint, text, boolean) FROM PUBLIC, anon, authenticated;
 REVOKE ALL ON FUNCTION "FLT".mark_paymongo_bet_failed(text, text) FROM PUBLIC, anon, authenticated;
