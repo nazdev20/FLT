@@ -308,14 +308,31 @@ export const FLTService = {
     const client = getClient();
     if (!client || !(await this.checkIsAdmin())) throw new Error('Administrator access is required.');
     let query = client.schema('FLT').from('bet_payment_submissions')
-      .select('*, bet:bet_id(*, battle:battle_id(*)), profile:user_id(username)')
+      .select('*, bet:bet_id(*, battle:battle_id(*))')
       .order('created_at', { ascending: false });
     if (statusFilter) query = query.eq('status', statusFilter);
     const { data, error } = await query;
-    if (error) throw new Error('Unable to load payment submissions.');
-    return (data || []).map((d: any) => ({
-      ...d, battle_title: d.bet?.battle?.title, emcee_a: d.bet?.battle?.emcee_a,
-      emcee_b: d.bet?.battle?.emcee_b, side: d.bet?.side, bettor_username: d.profile?.username,
+    if (error) throw new Error(error.message || 'Unable to load payment submissions.');
+
+    const submissions = data || [];
+    const userIds = [...new Set(submissions.map((item: any) => item.user_id).filter(Boolean))];
+    const usernamesById = new Map<string, string>();
+    if (userIds.length > 0) {
+      const { data: profiles, error: profilesError } = await client.schema('FLT')
+        .from('profiles').select('id, username').in('id', userIds);
+      if (profilesError) throw new Error(profilesError.message || 'Unable to load bettor profiles.');
+      for (const profile of profiles || []) {
+        usernamesById.set(profile.id, profile.username);
+      }
+    }
+
+    return submissions.map((d: any) => ({
+      ...d,
+      battle_title: d.bet?.battle?.title,
+      emcee_a: d.bet?.battle?.emcee_a,
+      emcee_b: d.bet?.battle?.emcee_b,
+      side: d.bet?.side,
+      bettor_username: usernamesById.get(d.user_id) || 'Unknown bettor',
     }));
   },
 

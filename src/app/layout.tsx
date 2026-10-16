@@ -4,6 +4,9 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'Pari-Mutuel Battle Engine',
   description: 'Rap battle wagering prototype with real-time pool odds, payment verification, and battle settlement workflows.',
+  icons: {
+    icon: '/icon.svg',
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
