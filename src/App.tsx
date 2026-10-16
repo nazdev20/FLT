@@ -93,7 +93,7 @@ export default function App() {
         <div className="border-b border-zinc-800 bg-zinc-900/60">
           <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-2 text-xs sm:px-6 lg:px-8">
             <button onClick={() => { void handleNavigation('admin_dashboard'); }} className={`rounded-xl px-3 py-1.5 font-bold transition-all ${activeTab === 'admin_dashboard' ? 'bg-amber-500 text-zinc-950 shadow' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}>Overview</button>
-            <button onClick={() => { void handleNavigation('admin_verification'); }} className={`rounded-xl px-3 py-1.5 font-bold transition-all ${activeTab === 'admin_verification' ? 'bg-amber-500 text-zinc-950 shadow' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}>Verification Queue ({pendingCount})</button>
+            <button onClick={() => { void handleNavigation('admin_verification'); }} className={`rounded-xl px-3 py-1.5 font-bold transition-all ${activeTab === 'admin_verification' ? 'bg-amber-500 text-zinc-950 shadow' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}>Pending Payments ({pendingCount})</button>
             <button onClick={() => { void handleNavigation('admin_battles'); }} className={`rounded-xl px-3 py-1.5 font-bold transition-all ${activeTab === 'admin_battles' ? 'bg-amber-500 text-zinc-950 shadow' : 'text-zinc-400 hover:bg-zinc-800 hover:text-white'}`}>Battle Management</button>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function App() {
       </main>
       <footer className="space-y-1 border-t border-zinc-800/80 bg-zinc-950 py-6 text-center text-xs text-zinc-400">
         <p className="font-semibold">FlipTop Battle Arena</p>
-        <p className="text-[11px]">Payment submissions require administrator review. Use this prototype only in accordance with applicable rules and laws.</p>
+        <p className="text-[11px]">Payments are verified automatically through PayMongo. A bet enters the pool only after the server confirms payment. Use this prototype only in accordance with applicable rules and laws.</p>
       </footer>
     </div>
   );
