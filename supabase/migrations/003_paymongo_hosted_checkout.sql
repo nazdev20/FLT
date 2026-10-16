@@ -183,6 +183,9 @@ BEGIN
   END IF;
 
   IF v_payment.payment_status = 'paid' THEN
+    IF v_payment.paymongo_payment_id IS DISTINCT FROM p_paymongo_payment_id THEN
+      RAISE EXCEPTION 'PAYMONGO_PAYMENT_ID_MISMATCH';
+    END IF;
     SELECT * INTO v_bet FROM "FLT".bets WHERE id = v_payment.bet_id;
     RETURN jsonb_build_object(
       'success', true,
@@ -326,8 +329,11 @@ SECURITY DEFINER
 SET search_path = pg_catalog
 AS $
 BEGIN
-  IF NEW.payment_status = 'paid' AND OLD.payment_status IS DISTINCT FROM 'paid'
+  IF NEW.payment_status IS DISTINCT FROM OLD.payment_status
      AND auth.role() <> 'service_role' THEN
+    RAISE EXCEPTION 'PAYMONGO_VERIFICATION_REQUIRED';
+  END IF;
+  IF NEW.status = 'paid' AND auth.role() <> 'service_role' THEN
     RAISE EXCEPTION 'PAYMONGO_VERIFICATION_REQUIRED';
   END IF;
   IF NEW.status = 'paid' AND NEW.payment_status <> 'paid' THEN
@@ -348,6 +354,8 @@ EXECUTE FUNCTION "FLT".guard_paymongo_payment_status();
 
 -- Disable the former manual-reference submission path. New bets must use the server route.
 REVOKE ALL ON FUNCTION "FLT".submit_bet_payment(uuid, text, numeric, text, text, text)
+  FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION "FLT".review_bet_payment(uuid, boolean, text)
   FROM PUBLIC, anon, authenticated;
 
 REVOKE ALL ON FUNCTION "FLT".create_paymongo_bet(uuid, uuid, text, numeric, text) FROM PUBLIC, anon, authenticated;
