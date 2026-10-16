@@ -25,32 +25,10 @@ export interface SupabaseConfig {
 }
 
 export function getSavedConfig(): SupabaseConfig {
-  try {
-    const saved = localStorage.getItem(CONFIG_STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.url && parsed.anonKey) {
-        return { url: parsed.url, anonKey: parsed.anonKey, isConfigured: true };
-      }
-    }
-  } catch {
-    // ignore
-  }
-
+  // Remove configuration saved by the retired profile settings panel.
+  try { localStorage.removeItem(CONFIG_STORAGE_KEY); } catch { /* ignore during SSR */ }
   const isConfigured = Boolean(ENV_URL && ENV_KEY && ENV_URL.startsWith('http'));
-  return {
-    url: ENV_URL,
-    anonKey: ENV_KEY,
-    isConfigured,
-  };
-}
-
-export function saveSupabaseConfig(url: string, anonKey: string) {
-  localStorage.setItem(
-    CONFIG_STORAGE_KEY,
-    JSON.stringify({ url: url.trim(), anonKey: anonKey.trim() })
-  );
-  initClient();
+  return { url: ENV_URL, anonKey: ENV_KEY, isConfigured };
 }
 
 let supabaseClient: any = null;
@@ -96,189 +74,7 @@ interface LocalDBState {
 }
 
 function getInitialLocalState(): LocalDBState {
-  const now = Date.now();
-  const starts1 = new Date(now + 2 * 3600 * 1000).toISOString();
-  const closes1 = new Date(now + 1 * 3600 * 1000).toISOString();
-
-  const starts2 = new Date(now + 5 * 3600 * 1000).toISOString();
-  const closes2 = new Date(now + 4 * 3600 * 1000).toISOString();
-
-  const starts3 = new Date(now + 40 * 60 * 1000).toISOString();
-  const closes3 = new Date(now - 20 * 60 * 1000).toISOString();
-
-  const adminId = 'a1111111-1111-1111-1111-111111111111';
-  const userId = 'u2222222-2222-2222-2222-222222222222';
-
-  const b1Id = 'b1111111-0000-0000-0000-000000000001';
-  const b2Id = 'b2222222-0000-0000-0000-000000000002';
-  const b3Id = 'b3333333-0000-0000-0000-000000000003';
-
-  return {
-    currentUserId: userId,
-    profiles: [
-      {
-        id: adminId,
-        username: 'FlipTopArbiter',
-        role: 'admin',
-        created_at: new Date(now - 86400000 * 10).toISOString(),
-      },
-      {
-        id: userId,
-        username: 'BettorKalibre',
-        role: 'user',
-        created_at: new Date(now - 86400000 * 5).toISOString(),
-      },
-    ],
-    battles: [
-      {
-        id: b1Id,
-        title: 'Ahon 14 - Battle of the Year Clash',
-        emcee_a: 'Loonie',
-        emcee_b: 'Sinio',
-        emcee_a_photo_url:
-          'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=400&auto=format&fit=crop&q=80',
-        emcee_b_photo_url:
-          'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=80',
-        starts_at: starts1,
-        betting_closes_at: closes1,
-        status: 'open',
-        fee_rate: 0.1,
-        pool_a: 5000,
-        pool_b: 3500,
-        total_pool: 8500,
-        accepted_bets_count: 5,
-        unique_bettors_count: 4,
-        platform_fee: 850,
-        distributable_pool: 7650,
-        odds_a: 1.53,
-        odds_b: 2.1857,
-        winner_side: null,
-        cancellation_reason: null,
-        locked_at: null,
-        settled_at: null,
-        created_by: adminId,
-        created_at: new Date(now - 86400000).toISOString(),
-      },
-      {
-        id: b2Id,
-        title: 'Bwelta Balentong X - Freestyle Masterclass',
-        emcee_a: 'Batas',
-        emcee_b: 'Dello',
-        emcee_a_photo_url:
-          'https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=400&auto=format&fit=crop&q=80',
-        emcee_b_photo_url:
-          'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&auto=format&fit=crop&q=80',
-        starts_at: starts2,
-        betting_closes_at: closes2,
-        status: 'open',
-        fee_rate: 0.1,
-        pool_a: 2000,
-        pool_b: 2500,
-        total_pool: 4500,
-        accepted_bets_count: 3,
-        unique_bettors_count: 3,
-        platform_fee: 450,
-        distributable_pool: 4050,
-        odds_a: 2.025,
-        odds_b: 1.62,
-        winner_side: null,
-        cancellation_reason: null,
-        locked_at: null,
-        settled_at: null,
-        created_by: adminId,
-        created_at: new Date(now - 43200000).toISOString(),
-      },
-      {
-        id: b3Id,
-        title: 'Unibersikulo Semifinals - Wordplay Clinic',
-        emcee_a: 'Tipsy D',
-        emcee_b: 'Poison13',
-        emcee_a_photo_url:
-          'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80',
-        emcee_b_photo_url:
-          'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80',
-        starts_at: starts3,
-        betting_closes_at: closes3,
-        status: 'locked',
-        fee_rate: 0.1,
-        pool_a: 4000,
-        pool_b: 3000,
-        total_pool: 7000,
-        accepted_bets_count: 4,
-        unique_bettors_count: 3,
-        platform_fee: 700,
-        distributable_pool: 6300,
-        odds_a: 1.575,
-        odds_b: 2.1,
-        winner_side: null,
-        cancellation_reason: null,
-        locked_at: closes3,
-        settled_at: null,
-        created_by: adminId,
-        created_at: new Date(now - 72000000).toISOString(),
-      },
-    ],
-    bets: [
-      {
-        id: 'bet-local-1',
-        battle_id: b1Id,
-        user_id: userId,
-        side: 'A',
-        stake: 1000,
-        status: 'accepted',
-        idempotency_key: 'idem-b1-1000-a',
-        accepted_at: new Date(now - 3600000).toISOString(),
-        snapshot_pool_a: 5000,
-        snapshot_pool_b: 3500,
-        snapshot_total_pool: 8500,
-        snapshot_distributable_pool: 7650,
-        snapshot_indicative_odds: 1.53,
-        gross_payout: 0,
-        net_profit: 0,
-        settled_at: null,
-        created_at: new Date(now - 4000000).toISOString(),
-      },
-      {
-        id: 'bet-local-2',
-        battle_id: b1Id,
-        user_id: userId,
-        side: 'B',
-        stake: 500,
-        status: 'pending_verification',
-        idempotency_key: 'idem-b1-500-b',
-        accepted_at: null,
-        snapshot_pool_a: null,
-        snapshot_pool_b: null,
-        snapshot_total_pool: null,
-        snapshot_distributable_pool: null,
-        snapshot_indicative_odds: null,
-        gross_payout: 0,
-        net_profit: 0,
-        settled_at: null,
-        created_at: new Date(now - 600000).toISOString(),
-      },
-    ],
-    submissions: [
-      {
-        id: 'sub-local-1',
-        bet_id: 'bet-local-2',
-        user_id: userId,
-        amount: 500,
-        payment_reference: 'GCASH-REF-892147',
-        receipt_url: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400',
-        status: 'pending',
-        review_note: null,
-        reviewed_by: null,
-        reviewed_at: null,
-        created_at: new Date(now - 600000).toISOString(),
-        battle_title: 'Ahon 14 - Battle of the Year Clash',
-        emcee_a: 'Loonie',
-        emcee_b: 'Sinio',
-        side: 'B',
-        bettor_username: 'BettorKalibre',
-      },
-    ],
-  };
+  return { battles: [], bets: [], submissions: [], profiles: [], currentUserId: '' };
 }
 
 class LocalFLTRepository {
@@ -290,17 +86,8 @@ class LocalFLTRepository {
   }
 
   private loadState(): LocalDBState {
-    try {
-      const s = localStorage.getItem(LOCAL_STORAGE_DB_KEY);
-      if (s) {
-        return JSON.parse(s);
-      }
-    } catch {
-      // ignore
-    }
-    const init = getInitialLocalState();
-    this.saveState(init);
-    return init;
+    try { localStorage.removeItem(LOCAL_STORAGE_DB_KEY); } catch { /* ignore */ }
+    return getInitialLocalState();
   }
 
   public saveState(s: LocalDBState) {
@@ -354,70 +141,39 @@ export const FLTService = {
   // Auth: Get current session / user
   async getCurrentUser(): Promise<{ user: User | null; profile: Profile | null }> {
     const client = getClient();
-    if (client) {
-      try {
-        const { data: { user } } = await client.auth.getUser();
-        if (user) {
-          const { data: profile } = await client
-            .schema('FLT')
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single();
-
-          return { user, profile: profile as Profile };
-        }
-      } catch (err) {
-        console.warn('Supabase auth getUser error:', err);
-      }
+    if (!client) return { user: null, profile: null };
+    try {
+      const { data: { user }, error: userError } = await client.auth.getUser();
+      if (userError || !user) return { user: null, profile: null };
+      const { data: profile, error: profileError } = await client.schema('FLT').from('profiles')
+        .select('id, username, role, created_at').eq('id', user.id).maybeSingle();
+      if (profileError || !profile) return { user, profile: null };
+      return { user, profile: profile as Profile };
+    } catch (err) {
+      console.warn('Unable to load authenticated profile:', err);
+      return { user: null, profile: null };
     }
-
-    // Local persona
-    const local = localRepo.getState();
-    const prof = local.profiles.find((p) => p.id === local.currentUserId) || local.profiles[1];
-    const mockUser: any = {
-      id: prof.id,
-      email: `${prof.username?.toLowerCase() || 'user'}@fliptop.test`,
-      created_at: prof.created_at,
-    };
-    return { user: mockUser, profile: prof };
   },
 
   // Check admin privileges via FLT.is_admin() RPC
   async checkIsAdmin(): Promise<boolean> {
     const client = getClient();
-    if (client) {
-      try {
-        const { data, error } = await client.schema('FLT').rpc('is_admin');
-        if (!error && typeof data === 'boolean') {
-          return data;
-        }
-      } catch (err) {
-        console.warn('FLT.is_admin RPC failed:', err);
-      }
-    }
-    const { profile } = await this.getCurrentUser();
-    return profile?.role === 'admin';
+    if (!client) return false;
+    const { user, profile } = await this.getCurrentUser();
+    if (!user || !profile || profile.role !== 'admin') return false;
+    try {
+      const { data, error } = await client.schema('FLT').rpc('is_admin');
+      return !error && data === true;
+    } catch { return false; }
   },
 
   // 1. Fetch Battles from FLT.battles
   async fetchBattles(): Promise<Battle[]> {
     const client = getClient();
-    if (client) {
-      try {
-        const { data, error } = await client
-          .schema('FLT')
-          .from('battles')
-          .select('*')
-          .order('starts_at', { ascending: true });
-
-        if (error) throw error;
-        if (data) return data as Battle[];
-      } catch (err) {
-        console.warn('Error fetching FLT.battles from Supabase, using local state:', err);
-      }
-    }
-    return localRepo.getState().battles;
+    if (!client) throw new Error('The battle service is unavailable. Please try again later.');
+    const { data, error } = await client.schema('FLT').from('battles').select('*').order('starts_at', { ascending: true });
+    if (error) throw new Error('Unable to load battles right now.');
+    return (data || []) as Battle[];
   },
 
   // 2. Fetch Single Battle with calculations
@@ -429,59 +185,10 @@ export const FLTService = {
   // 3. FLT.get_battle_pool_summary(p_battle_id)
   async getBattlePoolSummary(battleId: string): Promise<BattlePoolSummary> {
     const client = getClient();
-    if (client) {
-      try {
-        const { data, error } = await client
-          .schema('FLT')
-          .rpc('get_battle_pool_summary', { p_battle_id: battleId });
-
-        if (!error && data) {
-          return data as BattlePoolSummary;
-        }
-      } catch (err) {
-        console.warn('FLT.get_battle_pool_summary RPC failed, falling back:', err);
-      }
-    }
-
-    const state = localRepo.getState();
-    const battle = state.battles.find((b) => b.id === battleId);
-    const acceptedBets = state.bets.filter(
-      (b) => b.battle_id === battleId && ['accepted', 'settled_won', 'settled_lost'].includes(b.status)
-    );
-
-    let poolA = 0;
-    let poolB = 0;
-    let countA = 0;
-    let countB = 0;
-    const bettorSet = new Set<string>();
-
-    for (const b of acceptedBets) {
-      bettorSet.add(b.user_id);
-      if (b.side === 'A') {
-        poolA += Number(b.stake);
-        countA++;
-      } else {
-        poolB += Number(b.stake);
-        countB++;
-      }
-    }
-
-    const total = poolA + poolB;
-    const distributable = total * (1 - (battle?.fee_rate || 0.1));
-    const oddsA = poolA > 0 ? Math.round((distributable / poolA) * 10000) / 10000 : 0;
-    const oddsB = poolB > 0 ? Math.round((distributable / poolB) * 10000) / 10000 : 0;
-
-    return {
-      pool_a: poolA,
-      pool_b: poolB,
-      total_pool: total,
-      distributable_pool: distributable,
-      odds_a: oddsA,
-      odds_b: oddsB,
-      bets_count_a: countA,
-      bets_count_b: countB,
-      unique_bettors_count: bettorSet.size,
-    };
+    if (!client) throw new Error('The battle service is unavailable. Please try again later.');
+    const { data, error } = await client.schema('FLT').rpc('get_battle_pool_summary', { p_battle_id: battleId });
+    if (error || !data) throw new Error('Unable to load battle totals right now.');
+    return data as BattlePoolSummary;
   },
 
   // 4. FLT.submit_bet_payment
@@ -513,6 +220,7 @@ export const FLTService = {
       }
     }
 
+    throw new Error('Sign in and connect to the account service before submitting a payment.');
     // Local fallback implementation
     const state = localRepo.getState();
     const { user } = await this.getCurrentUser();
@@ -584,70 +292,31 @@ export const FLTService = {
   // 5. Fetch My Bets & Payment Submissions
   async fetchMyBets(userId: string): Promise<Bet[]> {
     const client = getClient();
-    if (client) {
-      try {
-        const { data, error } = await client
-          .schema('FLT')
-          .from('bets')
-          .select('*, battle:battle_id(*), payment_submission:bet_payment_submissions(*)')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false });
-
-        if (!error && data) {
-          return data as Bet[];
-        }
-      } catch (err) {
-        console.warn('Error fetching FLT.bets:', err);
-      }
-    }
-
-    const state = localRepo.getState();
-    return state.bets
-      .filter((b) => b.user_id === userId)
-      .map((b) => ({
-        ...b,
-        battle: state.battles.find((bat) => bat.id === b.battle_id),
-        payment_submission: state.submissions.find((s) => s.bet_id === b.id),
-      }));
+    if (!client) throw new Error('Sign in to view your bets.');
+    const { user } = await this.getCurrentUser();
+    if (!user) throw new Error('Sign in to view your bets.');
+    if (userId !== user.id) throw new Error('You can only view your own bets.');
+    const { data, error } = await client.schema('FLT').from('bets')
+      .select('*, battle:battle_id(*), payment_submission:bet_payment_submissions(*)')
+      .eq('user_id', user.id).order('created_at', { ascending: false });
+    if (error) throw new Error('Unable to load your bets right now.');
+    return (data || []) as Bet[];
   },
 
   // 6. Fetch Admin Payment Submissions
   async fetchPaymentSubmissions(statusFilter?: 'pending' | 'approved' | 'rejected'): Promise<BetPaymentSubmission[]> {
     const client = getClient();
-    if (client) {
-      try {
-        let query = client
-          .schema('FLT')
-          .from('bet_payment_submissions')
-          .select('*, bet:bet_id(*, battle:battle_id(*)), profile:user_id(username)')
-          .order('created_at', { ascending: false });
-
-        if (statusFilter) {
-          query = query.eq('status', statusFilter);
-        }
-
-        const { data, error } = await query;
-        if (!error && data) {
-          return data.map((d: any) => ({
-            ...d,
-            battle_title: d.bet?.battle?.title,
-            emcee_a: d.bet?.battle?.emcee_a,
-            emcee_b: d.bet?.battle?.emcee_b,
-            side: d.bet?.side,
-            bettor_username: d.profile?.username,
-          }));
-        }
-      } catch (err) {
-        console.warn('Error fetching FLT.bet_payment_submissions:', err);
-      }
-    }
-
-    const state = localRepo.getState();
-    let subs = state.submissions;
-    if (statusFilter) {
-      subs = subs.filter((s) => s.status === statusFilter);
-    }
-    return subs;
+    if (!client || !(await this.checkIsAdmin())) throw new Error('Administrator access is required.');
+    let query = client.schema('FLT').from('bet_payment_submissions')
+      .select('*, bet:bet_id(*, battle:battle_id(*)), profile:user_id(username)')
+      .order('created_at', { ascending: false });
+    if (statusFilter) query = query.eq('status', statusFilter);
+    const { data, error } = await query;
+    if (error) throw new Error('Unable to load payment submissions.');
+    return (data || []).map((d: any) => ({
+      ...d, battle_title: d.bet?.battle?.title, emcee_a: d.bet?.battle?.emcee_a,
+      emcee_b: d.bet?.battle?.emcee_b, side: d.bet?.side, bettor_username: d.profile?.username,
+    }));
   },
 
   // 7. FLT.review_bet_payment
@@ -673,6 +342,7 @@ export const FLTService = {
       }
     }
 
+    throw new Error('Administrator actions require a live authenticated session.');
     // Local fallback
     const state = localRepo.getState();
     const { user, profile } = await this.getCurrentUser();
@@ -783,6 +453,7 @@ export const FLTService = {
       }
     }
 
+    throw new Error('Administrator actions require a live authenticated session.');
     // Local fallback
     const state = localRepo.getState();
     const { user, profile } = await this.getCurrentUser();
@@ -844,6 +515,7 @@ export const FLTService = {
       }
     }
 
+    throw new Error('Administrator actions require a live authenticated session.');
     const state = localRepo.getState();
     const updated = state.battles.map((b) =>
       b.id === battleId ? { ...b, status: 'locked' as const, locked_at: new Date().toISOString() } : b

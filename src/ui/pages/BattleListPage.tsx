@@ -33,7 +33,7 @@ export const BattleListPage: React.FC<BattleListPageProps> = ({ onSelectBattle }
       const data = await FLTService.fetchBattles();
       setBattles(data);
     } catch (err: any) {
-      setError(err?.message || 'Failed to load battles from FLT.battles');
+      setError(err?.message || 'Failed to load battles');
     } finally {
       setLoading(false);
     }
@@ -60,9 +60,6 @@ export const BattleListPage: React.FC<BattleListPageProps> = ({ onSelectBattle }
             <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-rose-500/15 text-rose-400 border border-rose-500/30">
               <Flame className="w-3.5 h-3.5" />
               FlipTop Battle Arena
-            </span>
-            <span className="text-xs text-zinc-400 font-mono">
-              Schema: FLT • Manual QR Payment
             </span>
           </div>
 
@@ -148,7 +145,7 @@ export const BattleListPage: React.FC<BattleListPageProps> = ({ onSelectBattle }
       {loading && (
         <div className="py-20 text-center space-y-3">
           <Loader2 className="w-8 h-8 text-amber-400 animate-spin mx-auto" />
-          <p className="text-xs text-zinc-400">Loading matches from FLT.battles...</p>
+          <p className="text-xs text-zinc-400">Loading upcoming matches...</p>
         </div>
       )}
 
@@ -174,7 +171,7 @@ export const BattleListPage: React.FC<BattleListPageProps> = ({ onSelectBattle }
           <Swords className="w-10 h-10 text-zinc-600 mx-auto" />
           <h3 className="text-base font-bold text-white">No Battles Found</h3>
           <p className="text-xs text-zinc-400 max-w-sm mx-auto">
-            There are currently no battles matching the selected filter in FLT.battles.
+            Try another filter or check back later for upcoming matches.
           </p>
         </div>
       )}
