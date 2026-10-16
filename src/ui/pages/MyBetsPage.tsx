@@ -60,9 +60,9 @@ export const MyBetsPage: React.FC<MyBetsPageProps> = ({ onBrowseBattles }) => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4">
         <div>
-          <h1 className="text-2xl font-black text-white">My Wagers & Payment Submissions</h1>
+          <h1 className="text-2xl font-black text-white">My Bets & Payment Status</h1>
           <p className="text-xs text-zinc-400 mt-1">
-            Track your individual bet payments, verification statuses, and active pool odds
+            Track PayMongo payment confirmation, bet acceptance, and active pool odds
           </p>
         </div>
 
@@ -96,7 +96,7 @@ export const MyBetsPage: React.FC<MyBetsPageProps> = ({ onBrowseBattles }) => {
               : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
           }`}
         >
-          Pending Bank Verification ({bets.filter((b) => b.status === 'pending_verification').length})
+          Awaiting PayMongo ({bets.filter((b) => b.status === 'pending_verification').length})
         </button>
         <button
           onClick={() => setFilter('accepted')}
@@ -174,7 +174,7 @@ export const MyBetsPage: React.FC<MyBetsPageProps> = ({ onBrowseBattles }) => {
                   <th className="px-6 py-3.5">Selected Emcee</th>
                   <th className="px-6 py-3.5">Stake</th>
                   <th className="px-6 py-3.5">Payment Reference</th>
-                  <th className="px-6 py-3.5">Verification Status</th>
+                  <th className="px-6 py-3.5">Payment & Bet Status</th>
                   <th className="px-6 py-3.5">Pool Status</th>
                   <th className="px-6 py-3.5 text-right">Submitted At</th>
                 </tr>
@@ -224,7 +224,7 @@ export const MyBetsPage: React.FC<MyBetsPageProps> = ({ onBrowseBattles }) => {
                           <div className="space-y-0.5">
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 text-[10px] font-bold uppercase">
                               <Clock className="w-3 h-3" />
-                              pending_verification
+                              awaiting PayMongo
                             </span>
                             <span className="block text-[10px] text-zinc-400">
                               Awaiting bank check
@@ -236,7 +236,7 @@ export const MyBetsPage: React.FC<MyBetsPageProps> = ({ onBrowseBattles }) => {
                           <div className="space-y-0.5">
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 text-[10px] font-bold uppercase">
                               <CheckCircle2 className="w-3 h-3" />
-                              Accepted
+                              Payment Paid · Bet Accepted
                             </span>
                             {bet.snapshot_indicative_odds && (
                               <span className="block text-[10px] text-zinc-400 font-mono">
