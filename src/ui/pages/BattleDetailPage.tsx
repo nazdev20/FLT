@@ -22,7 +22,6 @@ export const BattleDetailPage: React.FC<BattleDetailPageProps> = ({
   battle,
   initialSide = 'A',
   onBack,
-  onViewMyBets,
 }) => {
   const [side, setSide] = useState<BattleSide>(initialSide);
   const [amountInput, setAmountInput] = useState<string>('500');
