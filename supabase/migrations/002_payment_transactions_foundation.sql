@@ -112,12 +112,20 @@ BEGIN
                 THEN "FLT".transactions.failure_reason
             ELSE EXCLUDED.failure_reason
         END,
-        paid_at = CASE WHEN EXCLUDED.status = 'succeeded'
-            THEN COALESCE("FLT".transactions.paid_at, EXCLUDED.paid_at)
-            ELSE "FLT".transactions.paid_at END,
-        failed_at = CASE WHEN EXCLUDED.status = 'failed'
-            THEN COALESCE("FLT".transactions.failed_at, EXCLUDED.failed_at)
-            ELSE "FLT".transactions.failed_at END,
+        paid_at = CASE
+            WHEN "FLT".transactions.status_source IN ('provider_webhook', 'provider_api')
+                THEN "FLT".transactions.paid_at
+            WHEN EXCLUDED.status = 'succeeded'
+                THEN COALESCE("FLT".transactions.paid_at, EXCLUDED.paid_at)
+            ELSE "FLT".transactions.paid_at
+        END,
+        failed_at = CASE
+            WHEN "FLT".transactions.status_source IN ('provider_webhook', 'provider_api')
+                THEN "FLT".transactions.failed_at
+            WHEN EXCLUDED.status = 'failed'
+                THEN COALESCE("FLT".transactions.failed_at, EXCLUDED.failed_at)
+            ELSE "FLT".transactions.failed_at
+        END,
         updated_at = NOW();
 
     RETURN NEW;
