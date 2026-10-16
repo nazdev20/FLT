@@ -91,8 +91,18 @@ export function verifyPayMongoSignature(
 }
 
 export function getAppBaseUrl(request: Request) {
-  const configured = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL;
-  const candidate = configured || new URL(request.url).origin;
+  const configured = process.env.NEXT_PUBLIC_APP_URL || process.env.APP_URL || '';
+  let candidate = new URL(request.url).origin;
+  if (configured && !configured.includes('MY_APP_URL')) {
+    try {
+      const configuredUrl = new URL(configured);
+      if (configuredUrl.protocol === 'https:' || configuredUrl.hostname === 'localhost' || configuredUrl.hostname === '127.0.0.1') {
+        candidate = configuredUrl.origin;
+      }
+    } catch {
+      // Use the current deployment origin when an optional URL is unset or malformed.
+    }
+  }
   const url = new URL(candidate);
   if (url.protocol !== 'https:' && url.hostname !== 'localhost' && url.hostname !== '127.0.0.1') {
     throw new Error('APP_URL must use HTTPS outside localhost.');
