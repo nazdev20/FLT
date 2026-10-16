@@ -44,6 +44,7 @@ export default function PaymentResultPage() {
         if (!client) {
           setMessage('Sign in to FLT to check your payment status.');
           setIsLoading(false);
+          if (interval) clearInterval(interval);
           return;
         }
 
@@ -52,6 +53,7 @@ export default function PaymentResultPage() {
         if (error || !token) {
           setMessage('Your FLT session has expired. Sign in again to check payment status.');
           setIsLoading(false);
+          if (interval) clearInterval(interval);
           return;
         }
 
@@ -88,6 +90,7 @@ export default function PaymentResultPage() {
         if (!active) return;
         setMessage(error instanceof Error ? error.message : 'Could not retrieve payment status.');
         setIsLoading(false);
+        if (interval) clearInterval(interval);
       }
     }
 
