@@ -37,6 +37,9 @@ export const AdminVerificationPage: React.FC = () => {
   }, [loadSubmissions]);
 
   const statusLabel = (submission: BetPaymentSubmission) => {
+    if (submission.status === 'paid' || submission.status === 'failed' || submission.status === 'rejected') {
+      return submission.status;
+    }
     if (submission.payment_status) return submission.payment_status;
     return submission.status;
   };
