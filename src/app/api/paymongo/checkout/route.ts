@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     const amount = Number(body?.amount);
     const idempotencyKey = typeof body?.idempotencyKey === 'string' ? body.idempotencyKey : '';
 
-    if (!/^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(battleId)) {
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(battleId)) {
       return jsonError('Invalid battle.', 400);
     }
     if (side !== 'A' && side !== 'B') return jsonError('Choose a valid battle side.', 400);
@@ -84,6 +84,7 @@ export async function POST(request: Request) {
       payment_id: string;
       payment_reference: string;
       checkout_url: string | null;
+      paymongo_livemode: boolean | null;
       payment_status: string;
       bet_status: string;
       reused: boolean;
@@ -97,6 +98,9 @@ export async function POST(request: Request) {
       return jsonError('This payment attempt failed. Please start a new payment.', 409);
     }
     if (payment.checkout_url) {
+      if (payment.paymongo_livemode !== (mode === 'live')) {
+        return jsonError('Existing checkout mode does not match the current PayMongo environment.', 409);
+      }
       return NextResponse.json({
         checkout_url: payment.checkout_url,
         payment_reference: payment.payment_reference,
