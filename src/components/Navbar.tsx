@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { FLTService, getClient } from '../lib/flt-service';
 import { Profile } from '../types/database';
-import { Swords, Shield, Receipt, User as UserIcon, LogIn } from 'lucide-react';
+import { Swords, Shield, Receipt, User as UserIcon, LogIn, Settings2 } from 'lucide-react';
 
 export type NavTab = 'battles' | 'battle_detail' | 'my_bets' | 'admin_dashboard' | 'admin_verification' | 'admin_battles' | 'profile' | 'login';
 
@@ -41,7 +41,8 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
           </button>
           <nav className="hidden items-center gap-1 rounded-2xl border border-zinc-800 bg-zinc-900/80 p-1 md:flex">
             {navButton('battles', 'Battles', <Swords className="h-3.5 w-3.5" />)}
-            {isSignedIn && navButton('my_bets', 'My Bets', <Receipt className="h-3.5 w-3.5" />)}
+            {isSignedIn && !isAdmin && navButton('my_bets', 'My Bets', <Receipt className="h-3.5 w-3.5" />)}
+            {isAdmin && navButton('admin_battles', 'Manage Battles', <Settings2 className="h-3.5 w-3.5" />)}
             {isAdmin && navButton('admin_verification', 'Admin Desk', <Shield className="h-3.5 w-3.5" />)}
             {isSignedIn && navButton('profile', 'Profile', <UserIcon className="h-3.5 w-3.5" />)}
           </nav>
@@ -51,8 +52,9 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab }) => {
         </div>
         <div className="flex items-center justify-around border-t border-zinc-800/60 py-2 text-xs md:hidden">
           {navButton('battles', 'Battles', <Swords className="h-3.5 w-3.5" />)}
-          {isSignedIn && navButton('my_bets', 'My Bets', <Receipt className="h-3.5 w-3.5" />)}
-          {isAdmin && navButton('admin_verification', 'Admin', <Shield className="h-3.5 w-3.5" />)}
+          {isSignedIn && !isAdmin && navButton('my_bets', 'My Bets', <Receipt className="h-3.5 w-3.5" />)}
+          {isAdmin && navButton('admin_battles', 'Manage Battles', <Settings2 className="h-3.5 w-3.5" />)}
+          {isAdmin && navButton('admin_verification', 'Admin Desk', <Shield className="h-3.5 w-3.5" />)}
           {isSignedIn && navButton('profile', 'Profile', <UserIcon className="h-3.5 w-3.5" />)}
         </div>
       </div>
