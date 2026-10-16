@@ -120,7 +120,78 @@ BEGIN
 END;
 $$;
 
+-- Keep the application's FLT schema calls aligned with the database objects.
+CREATE OR REPLACE FUNCTION "FLT".create_battle(
+  p_title text,
+  p_emcee_a text,
+  p_emcee_b text,
+  p_emcee_a_photo_url text,
+  p_emcee_b_photo_url text,
+  p_starts_at timestamptz
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog
+AS $
+DECLARE
+  v_admin_id uuid := auth.uid();
+  v_battle_id uuid;
+  v_betting_closes_at timestamptz;
+BEGIN
+  IF v_admin_id IS NULL OR NOT EXISTS (
+    SELECT 1 FROM "FLT".profiles WHERE id = v_admin_id AND role = 'admin'
+  ) THEN
+    RAISE EXCEPTION 'Administrator access is required.';
+  END IF;
+  IF COALESCE(BTRIM(p_title), '') = '' OR COALESCE(BTRIM(p_emcee_a), '') = '' OR COALESCE(BTRIM(p_emcee_b), '') = '' THEN
+    RAISE EXCEPTION 'Match title and both emcee names are required.';
+  END IF;
+  IF p_starts_at IS NULL OR p_starts_at <= NOW() THEN
+    RAISE EXCEPTION 'Battle start time must be in the future.';
+  END IF;
+
+  v_betting_closes_at := p_starts_at - INTERVAL '1 hour';
+  INSERT INTO "FLT".battles (
+    title, emcee_a, emcee_b, emcee_a_photo_url, emcee_b_photo_url,
+    starts_at, betting_closes_at, status, fee_rate, created_by
+  ) VALUES (
+    BTRIM(p_title), BTRIM(p_emcee_a), BTRIM(p_emcee_b),
+    NULLIF(BTRIM(COALESCE(p_emcee_a_photo_url, '')), ''),
+    NULLIF(BTRIM(COALESCE(p_emcee_b_photo_url, '')), ''),
+    p_starts_at, v_betting_closes_at, 'open', 0.1000, v_admin_id
+  ) RETURNING id INTO v_battle_id;
+
+  RETURN jsonb_build_object('success', true, 'battle_id', v_battle_id, 'betting_closes_at', v_betting_closes_at);
+END;
+$;
+
+CREATE OR REPLACE FUNCTION "FLT".lock_battle(p_battle_id uuid)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = pg_catalog
+AS $
+DECLARE
+  v_admin_id uuid := auth.uid();
+BEGIN
+  IF v_admin_id IS NULL OR NOT EXISTS (
+    SELECT 1 FROM "FLT".profiles WHERE id = v_admin_id AND role = 'admin'
+  ) THEN
+    RAISE EXCEPTION 'Administrator access is required.';
+  END IF;
+  UPDATE "FLT".battles SET status = 'locked', locked_at = NOW()
+  WHERE id = p_battle_id AND status = 'open';
+  IF NOT FOUND THEN RAISE EXCEPTION 'Battle not found or cannot be locked.'; END IF;
+  RETURN jsonb_build_object('success', true, 'battle_id', p_battle_id, 'status', 'locked');
+END;
+$;
+
+REVOKE ALL ON FUNCTION "FLT".create_battle(text, text, text, text, text, timestamptz) FROM PUBLIC;
+REVOKE ALL ON FUNCTION "FLT".lock_battle(uuid) FROM PUBLIC;
 REVOKE ALL ON FUNCTION "FLT".update_battle(uuid, text, text, text, text, text, timestamptz) FROM PUBLIC;
 REVOKE ALL ON FUNCTION "FLT".record_battle_result(uuid, text, integer, integer) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION "FLT".create_battle(text, text, text, text, text, timestamptz) TO authenticated;
+GRANT EXECUTE ON FUNCTION "FLT".lock_battle(uuid) TO authenticated;
 GRANT EXECUTE ON FUNCTION "FLT".update_battle(uuid, text, text, text, text, text, timestamptz) TO authenticated;
 GRANT EXECUTE ON FUNCTION "FLT".record_battle_result(uuid, text, integer, integer) TO authenticated;
