@@ -347,7 +347,7 @@ export const FLTService = {
   },
 
   // 6. Fetch Admin Payment Submissions
-  async fetchPaymentSubmissions(statusFilter?: 'pending' | 'approved' | 'rejected'): Promise<BetPaymentSubmission[]> {
+  async fetchPaymentSubmissions(statusFilter?: 'pending' | 'approved' | 'rejected' | 'paid' | 'failed'): Promise<BetPaymentSubmission[]> {
     const client = getClient();
     if (!client || !(await this.checkIsAdmin())) throw new Error('Administrator access is required.');
     let query = client.schema('FLT').from('bet_payment_submissions')
