@@ -540,6 +540,43 @@ export const FLTService = {
     localRepo.saveState({ ...state, battles: updated });
   },
 
+  // Update an upcoming battle before any bets have been submitted.
+  async updateBattle(
+    battleId: string,
+    title: string,
+    emceeA: string,
+    emceeB: string,
+    emceeAPhoto: string,
+    emceeBPhoto: string,
+    startsAtIso: string
+  ): Promise<void> {
+    const client = getClient();
+    if (!client || !(await this.checkIsAdmin())) throw new Error('Administrator access is required.');
+    const { error } = await client.schema('FLT').rpc('update_battle', {
+      p_battle_id: battleId,
+      p_title: title.trim(),
+      p_emcee_a: emceeA.trim(),
+      p_emcee_b: emceeB.trim(),
+      p_emcee_a_photo_url: emceeAPhoto.trim(),
+      p_emcee_b_photo_url: emceeBPhoto.trim(),
+      p_starts_at: startsAtIso,
+    });
+    if (error) throw new Error(error.message || 'Unable to update battle.');
+  },
+
+  // Record the official result only; this does not process or confirm manual payouts.
+  async recordBattleResult(battleId: string, winnerSide: BattleSide, scoreA: number, scoreB: number): Promise<void> {
+    const client = getClient();
+    if (!client || !(await this.checkIsAdmin())) throw new Error('Administrator access is required.');
+    const { error } = await client.schema('FLT').rpc('record_battle_result', {
+      p_battle_id: battleId,
+      p_winner_side: winnerSide,
+      p_emcee_a_score: scoreA,
+      p_emcee_b_score: scoreB,
+    });
+    if (error) throw new Error(error.message || 'Unable to record battle result.');
+  },
+
   // 10. FLT.sync_battle_lock
   async syncBattleLock(battleId: string): Promise<void> {
     const client = getClient();
