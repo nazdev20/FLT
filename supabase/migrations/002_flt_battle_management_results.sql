@@ -77,7 +77,7 @@ BEGIN
     RAISE EXCEPTION 'Administrator access is required.';
   END IF;
 
-  IF p_winner_side NOT IN ('A', 'B') THEN
+  IF p_winner_side IS NULL OR p_winner_side NOT IN ('A', 'B') THEN
     RAISE EXCEPTION 'Winner side must be A or B.';
   END IF;
   IF p_emcee_a_score IS NULL OR p_emcee_b_score IS NULL OR p_emcee_a_score < 0 OR p_emcee_b_score < 0 THEN
