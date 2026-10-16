@@ -52,7 +52,12 @@ export default function App() {
   };
 
   const handleSelectBattle = async (battle: Battle, side: BattleSide = 'A') => {
-    const { user } = await FLTService.getCurrentUser();
+    const { user, profile } = await FLTService.getCurrentUser();
+    if (profile?.role === 'admin') {
+      setNotice('Administrator accounts manage battles and cannot place bets.');
+      setActiveTab('admin_battles');
+      return;
+    }
     setSelectedBattle(battle);
     setInitialSide(side);
     if (!user) { setNotice('Sign in to continue to your betting workflow.'); setActiveTab('login'); return; }
