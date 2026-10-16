@@ -40,8 +40,8 @@ BEGIN
   SET title = BTRIM(p_title),
       emcee_a = BTRIM(p_emcee_a),
       emcee_b = BTRIM(p_emcee_b),
-      emcee_a_photo_url = NULLIF(BTRIM(COALESCE(p_emcee_a_photo_url, '')), ''),
-      emcee_b_photo_url = NULLIF(BTRIM(COALESCE(p_emcee_b_photo_url, '')), ''),
+      emcee_a_photo_url = COALESCE(NULLIF(BTRIM(COALESCE(p_emcee_a_photo_url, '')), ''), b.emcee_a_photo_url),
+      emcee_b_photo_url = COALESCE(NULLIF(BTRIM(COALESCE(p_emcee_b_photo_url, '')), ''), b.emcee_b_photo_url),
       starts_at = p_starts_at,
       betting_closes_at = p_starts_at - INTERVAL '1 hour'
   WHERE b.id = p_battle_id
