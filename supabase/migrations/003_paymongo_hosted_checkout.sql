@@ -51,7 +51,7 @@ DECLARE
   v_payment "FLT".bet_payment_submissions%ROWTYPE;
   v_reference text;
 BEGIN
-  IF auth.role() <> 'service_role' THEN
+  IF COALESCE(auth.role(), '') <> 'service_role' THEN
     RAISE EXCEPTION 'SERVICE_ROLE_REQUIRED';
   END IF;
   IF p_user_id IS NULL OR NOT EXISTS (
@@ -156,7 +156,7 @@ DECLARE
   v_count integer;
   v_users integer;
 BEGIN
-  IF auth.role() <> 'service_role' THEN
+  IF COALESCE(auth.role(), '') <> 'service_role' THEN
     RAISE EXCEPTION 'SERVICE_ROLE_REQUIRED';
   END IF;
   IF COALESCE(trim(p_payment_reference), '') = ''
@@ -294,7 +294,7 @@ AS $$
 DECLARE
   v_payment "FLT".bet_payment_submissions%ROWTYPE;
 BEGIN
-  IF auth.role() <> 'service_role' THEN
+  IF COALESCE(auth.role(), '') <> 'service_role' THEN
     RAISE EXCEPTION 'SERVICE_ROLE_REQUIRED';
   END IF;
 
@@ -330,7 +330,7 @@ SET search_path = pg_catalog
 AS $
 BEGIN
   IF NEW.payment_status IS DISTINCT FROM OLD.payment_status
-     AND auth.role() <> 'service_role' THEN
+     AND COALESCE(auth.role(), '') <> 'service_role' THEN
     RAISE EXCEPTION 'PAYMONGO_VERIFICATION_REQUIRED';
   END IF;
   IF NEW.status = 'paid' AND auth.role() <> 'service_role' THEN
