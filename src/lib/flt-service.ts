@@ -6,6 +6,7 @@ import {
   Profile,
   BattlePoolSummary,
   BattleSide,
+  PaymentTransaction,
 } from '../types/database';
 
 // Next.js exposes only NEXT_PUBLIC_* variables to browser code.
@@ -553,6 +554,27 @@ export const FLTService = {
       created_at: nowIso,
     };
 
+    const transactionId = crypto.randomUUID();
+    const newTransaction: PaymentTransaction = {
+      id: transactionId,
+      bet_id: betId,
+      payment_submission_id: paymentId,
+      user_id: user.id,
+      amount,
+      currency: 'PHP',
+      provider: 'manual_transfer',
+      provider_reference: paymentReference,
+      status: 'pending',
+      status_source: 'manual_review',
+      failure_reason: null,
+      metadata: { source: 'local-development' },
+      paid_at: null,
+      failed_at: null,
+      refunded_at: null,
+      created_at: nowIso,
+      updated_at: nowIso,
+    };
+
     const newSub: BetPaymentSubmission = {
       id: paymentId,
       bet_id: betId,
@@ -570,6 +592,7 @@ export const FLTService = {
       emcee_b: battle.emcee_b,
       side,
       bettor_username: user.email?.split('@')[0] || 'User',
+      transaction: newTransaction,
     };
 
     localRepo.saveState({
@@ -589,7 +612,7 @@ export const FLTService = {
         const { data, error } = await client
           .schema('FLT')
           .from('bets')
-          .select('*, battle:battle_id(*), payment_submission:bet_payment_submissions(*)')
+          .select('*, battle:battle_id(*), payment_submission:bet_payment_submissions(*, transaction:transactions(*))')
           .eq('user_id', userId)
           .order('created_at', { ascending: false });
 
@@ -697,6 +720,17 @@ export const FLTService = {
             review_note: reviewNote,
             reviewed_by: user?.id || null,
             reviewed_at: nowIso,
+            transaction: s.transaction
+              ? {
+                  ...s.transaction,
+                  status: approve ? 'succeeded' as const : 'failed' as const,
+                  status_source: 'manual_review' as const,
+                  failure_reason: approve ? null : reviewNote || null,
+                  paid_at: approve ? nowIso : null,
+                  failed_at: approve ? null : nowIso,
+                  updated_at: nowIso,
+                }
+              : s.transaction,
           }
         : s
     );
