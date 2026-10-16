@@ -227,7 +227,7 @@ export const MyBetsPage: React.FC<MyBetsPageProps> = ({ onBrowseBattles }) => {
                               awaiting PayMongo
                             </span>
                             <span className="block text-[10px] text-zinc-400">
-                              Awaiting bank check
+                              Awaiting PayMongo confirmation
                             </span>
                           </div>
                         )}
