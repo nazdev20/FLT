@@ -92,7 +92,7 @@ export interface PaymentTransaction {
   user_id: string;
   amount: number;
   currency: 'PHP';
-  provider: 'manual_transfer' | 'sandbox';
+  provider: 'manual_transfer' | 'sandbox' | 'paymongo';
   provider_reference: string | null;
   status: TransactionStatus;
   status_source: TransactionStatusSource;
@@ -125,6 +125,7 @@ export interface BetPaymentSubmission {
   emcee_b?: string;
   side?: BattleSide;
   bettor_username?: string;
+  transaction?: PaymentTransaction | null;
 }
 
 export interface BattleSettlement {
