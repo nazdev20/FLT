@@ -31,6 +31,8 @@ export interface Battle {
   odds_a?: number;
   odds_b?: number;
   winner_side: BattleSide | null;
+  emcee_a_score?: number | null;
+  emcee_b_score?: number | null;
   cancellation_reason: string | null;
   locked_at: string | null;
   settled_at: string | null;
