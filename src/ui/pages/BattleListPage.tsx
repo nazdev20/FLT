@@ -311,6 +311,14 @@ export const BattleListPage: React.FC<BattleListPageProps> = ({ onSelectBattle }
                   </div>
                 </div>
 
+                {battle.status === 'settled' && battle.emcee_a_score != null && battle.emcee_b_score != null && (
+                  <div className="mx-6 mb-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-center">
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-300">Official Result</div>
+                    <div className="mt-1 text-sm font-black text-white">{battle.emcee_a} <span className="font-mono text-amber-300">{battle.emcee_a_score} - {battle.emcee_b_score}</span> {battle.emcee_b}</div>
+                    <div className="mt-1 text-xs font-bold text-emerald-300">Winner: {battle.winner_side === 'A' ? battle.emcee_a : battle.emcee_b}</div>
+                  </div>
+                )}
+
                 {/* Pool Tug of War Bar */}
                 <div className="px-6 py-3 bg-zinc-950/50 border-t border-zinc-800/60 mt-auto">
                   <div className="flex justify-between text-[11px] font-mono mb-1 text-zinc-400">
