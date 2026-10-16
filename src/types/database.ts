@@ -83,6 +83,7 @@ export interface BetPaymentSubmission {
   payment_reference: string;
   receipt_url: string | null;
   status: PaymentSubmissionStatus;
+  payment_status?: 'pending' | 'paid' | 'failed';
   review_note: string | null;
   reviewed_by: string | null;
   reviewed_at: string | null;
