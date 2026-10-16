@@ -280,6 +280,7 @@ export const AdminBattleManagementPage: React.FC = () => {
                       <td className="px-6 py-4">
                         {b.status === 'settled' && b.emcee_a_score != null && b.emcee_b_score != null && (
                           <div className="mb-1 text-[10px] font-mono text-zinc-300">{b.emcee_a_score} - {b.emcee_b_score}</div>
+                          <div className="text-[10px] font-bold text-emerald-300">Winner: {b.winner_side === 'A' ? b.emcee_a : b.emcee_b}</div>
                         )}
                         {b.status === 'open' && (
                           <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-bold uppercase">
