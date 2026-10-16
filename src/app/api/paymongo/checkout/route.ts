@@ -103,6 +103,9 @@ export async function POST(request: Request) {
         bet_id: payment.bet_id,
       });
     }
+    if (payment.reused) {
+      return jsonError('A checkout session is already being prepared. Please wait a moment and try again.', 409);
+    }
 
     const appBaseUrl = getAppBaseUrl(request);
     const successUrl = new URL('/payment-result', appBaseUrl);
