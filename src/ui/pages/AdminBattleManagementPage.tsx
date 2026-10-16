@@ -80,7 +80,7 @@ export const AdminBattleManagementPage: React.FC = () => {
     setManageSubmitting(true);
     try {
       const start = new Date(manageStartsAt);
-      if (start.getTime() <= Date.now()) throw new Error('Start time must be in the future.');
+      if (start.getTime() <= Date.now() + 60 * 60 * 1000) throw new Error('Start time must be at least one hour in the future.');
       if (!manageTitle.trim() || !manageEmceeA.trim() || !manageEmceeB.trim()) throw new Error('Title and both emcee names are required.');
       await FLTService.updateBattle(managingBattle.id, manageTitle, manageEmceeA, manageEmceeB, managePhotoA, managePhotoB, start.toISOString());
       setManagingBattle(null);
@@ -148,8 +148,8 @@ export const AdminBattleManagementPage: React.FC = () => {
     setIsSubmitting(true);
     try {
       const startsDate = new Date(startsAt);
-      if (startsDate.getTime() <= Date.now()) {
-        throw new Error('Battle start time must be in the future.');
+      if (startsDate.getTime() <= Date.now() + 60 * 60 * 1000) {
+        throw new Error('Battle start time must be at least one hour in the future.');
       }
 
       await FLTService.createBattle(
