@@ -191,6 +191,48 @@ export const FLTService = {
     return data as BattlePoolSummary;
   },
 
+  // Create a server-verified PayMongo Hosted Checkout session.
+  async createPayMongoCheckout(
+    battleId: string,
+    side: BattleSide,
+    amount: number,
+    idempotencyKey: string
+  ): Promise<{ checkout_url: string; payment_reference: string; bet_id: string }> {
+    const client = getClient();
+    if (!client) throw new Error('The account service is unavailable. Please try again later.');
+
+    const { data, error: sessionError } = await client.auth.getSession();
+    const accessToken = data.session?.access_token;
+    if (sessionError || !accessToken) {
+      throw new Error('Please sign in again before starting payment.');
+    }
+
+    const response = await fetch('/api/paymongo/checkout', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ battleId, side, amount, idempotencyKey }),
+      cache: 'no-store',
+    });
+
+    const result = await response.json().catch(() => null);
+    if (!response.ok) {
+      throw new Error(result?.error || 'Unable to start PayMongo checkout.');
+    }
+    if (
+      typeof result?.checkout_url !== 'string' ||
+      !result.checkout_url.startsWith('https://checkout.paymongo.com/') ||
+      typeof result?.payment_reference !== 'string' ||
+      typeof result?.bet_id !== 'string'
+    ) {
+      throw new Error('PayMongo returned an invalid checkout response.');
+    }
+
+    return result;
+  },
+
   // 4. FLT.submit_bet_payment
   // Core user workflow step 8: User submits bet with payment reference
   async submitBetPayment(
@@ -305,7 +347,7 @@ export const FLTService = {
   },
 
   // 6. Fetch Admin Payment Submissions
-  async fetchPaymentSubmissions(statusFilter?: 'pending' | 'approved' | 'rejected'): Promise<BetPaymentSubmission[]> {
+  async fetchPaymentSubmissions(statusFilter?: 'pending' | 'approved' | 'rejected' | 'paid' | 'failed'): Promise<BetPaymentSubmission[]> {
     const client = getClient();
     if (!client || !(await this.checkIsAdmin())) throw new Error('Administrator access is required.');
     let query = client.schema('FLT').from('bet_payment_submissions')
@@ -330,6 +372,7 @@ export const FLTService = {
     return submissions.map((d: any) => ({
       ...d,
       battle_title: d.bet?.battle?.title,
+      bet_status: d.bet?.status,
       emcee_a: d.bet?.battle?.emcee_a,
       emcee_b: d.bet?.battle?.emcee_b,
       side: d.bet?.side,

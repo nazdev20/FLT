@@ -73,7 +73,7 @@ export interface Bet {
   payment_submission?: BetPaymentSubmission;
 }
 
-export type PaymentSubmissionStatus = 'pending' | 'approved' | 'rejected';
+export type PaymentSubmissionStatus = 'pending' | 'approved' | 'rejected' | 'paid' | 'failed';
 
 export interface BetPaymentSubmission {
   id: string;
@@ -83,6 +83,8 @@ export interface BetPaymentSubmission {
   payment_reference: string;
   receipt_url: string | null;
   status: PaymentSubmissionStatus;
+  payment_status?: 'pending' | 'paid' | 'failed';
+  bet_status?: string;
   review_note: string | null;
   reviewed_by: string | null;
   reviewed_at: string | null;
