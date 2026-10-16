@@ -85,6 +85,7 @@ BEGIN
       'payment_id', v_payment.id,
       'payment_reference', v_payment.payment_reference,
       'checkout_url', v_payment.paymongo_checkout_url,
+      'paymongo_livemode', v_payment.paymongo_livemode,
       'payment_status', v_payment.payment_status,
       'bet_status', v_bet.status,
       'reused', true
@@ -120,6 +121,7 @@ BEGIN
     'payment_id', v_payment.id,
     'payment_reference', v_reference,
     'checkout_url', NULL,
+    'paymongo_livemode', NULL,
     'payment_status', 'pending',
     'bet_status', v_bet.status,
     'reused', false
