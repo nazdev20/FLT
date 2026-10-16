@@ -71,6 +71,40 @@ export interface Bet {
   payment_submission?: BetPaymentSubmission;
 }
 
+export type TransactionStatus =
+  | 'pending'
+  | 'succeeded'
+  | 'failed'
+  | 'cancelled'
+  | 'expired'
+  | 'refunded';
+
+export type TransactionStatusSource =
+  | 'manual_review'
+  | 'provider_webhook'
+  | 'provider_api'
+  | 'system';
+
+export interface PaymentTransaction {
+  id: string;
+  bet_id: string;
+  payment_submission_id: string;
+  user_id: string;
+  amount: number;
+  currency: 'PHP';
+  provider: 'manual_transfer' | 'sandbox' | 'paymongo';
+  provider_reference: string | null;
+  status: TransactionStatus;
+  status_source: TransactionStatusSource;
+  failure_reason: string | null;
+  metadata: Record<string, unknown>;
+  paid_at: string | null;
+  failed_at: string | null;
+  refunded_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export type PaymentSubmissionStatus = 'pending' | 'approved' | 'rejected';
 
 export interface BetPaymentSubmission {
@@ -91,6 +125,7 @@ export interface BetPaymentSubmission {
   emcee_b?: string;
   side?: BattleSide;
   bettor_username?: string;
+  transaction?: PaymentTransaction | null;
 }
 
 export interface BattleSettlement {

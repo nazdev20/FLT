@@ -174,7 +174,8 @@ export const MyBetsPage: React.FC<MyBetsPageProps> = ({ onBrowseBattles }) => {
                   <th className="px-6 py-3.5">Selected Emcee</th>
                   <th className="px-6 py-3.5">Stake</th>
                   <th className="px-6 py-3.5">Payment Reference</th>
-                  <th className="px-6 py-3.5">Verification Status</th>
+                  <th className="px-6 py-3.5">Bet Status</th>
+                  <th className="px-6 py-3.5">Payment Status</th>
                   <th className="px-6 py-3.5">Pool Status</th>
                   <th className="px-6 py-3.5 text-right">Submitted At</th>
                 </tr>
@@ -270,6 +271,22 @@ export const MyBetsPage: React.FC<MyBetsPageProps> = ({ onBrowseBattles }) => {
                             Lost
                           </span>
                         )}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
+                          (sub?.transaction?.status || (sub?.status === 'approved' ? 'succeeded' : sub?.status === 'rejected' ? 'failed' : 'pending')) === 'succeeded'
+                            ? 'bg-emerald-500/15 text-emerald-300'
+                            : (sub?.transaction?.status || (sub?.status === 'approved' ? 'succeeded' : sub?.status === 'rejected' ? 'failed' : 'pending')) === 'failed'
+                              ? 'bg-rose-500/15 text-rose-300'
+                              : 'bg-amber-500/15 text-amber-300'
+                        }`}>
+                          {sub?.transaction?.status || (sub?.status === 'approved' ? 'succeeded' : sub?.status === 'rejected' ? 'failed' : 'pending')}
+                        </span>
+                        <span className="block mt-1 text-[10px] text-zinc-500">
+                          {sub?.transaction?.status_source === 'provider_webhook' || sub?.transaction?.status_source === 'provider_api'
+                            ? 'Provider verified'
+                            : 'Manual review'}
+                        </span>
                       </td>
                       <td className="px-6 py-4">
                         {bet.status === 'pending_verification' ? (
