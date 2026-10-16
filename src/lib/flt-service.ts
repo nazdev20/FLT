@@ -201,6 +201,7 @@ export const FLTService = {
     paymentReference: string,
     receiptUrl: string | null = null
   ): Promise<{ bet_id: string; payment_id: string; status: string }> {
+    if (await this.checkIsAdmin()) throw new Error('Administrator accounts cannot place bets.');
     const client = getClient();
     if (client) {
       try {
