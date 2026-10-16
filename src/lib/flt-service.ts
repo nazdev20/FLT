@@ -25,32 +25,10 @@ export interface SupabaseConfig {
 }
 
 export function getSavedConfig(): SupabaseConfig {
-  try {
-    const saved = localStorage.getItem(CONFIG_STORAGE_KEY);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.url && parsed.anonKey) {
-        return { url: parsed.url, anonKey: parsed.anonKey, isConfigured: true };
-      }
-    }
-  } catch {
-    // ignore
-  }
-
+  // Remove configuration saved by the retired profile settings panel.
+  try { localStorage.removeItem(CONFIG_STORAGE_KEY); } catch { /* ignore during SSR */ }
   const isConfigured = Boolean(ENV_URL && ENV_KEY && ENV_URL.startsWith('http'));
-  return {
-    url: ENV_URL,
-    anonKey: ENV_KEY,
-    isConfigured,
-  };
-}
-
-export function saveSupabaseConfig(url: string, anonKey: string) {
-  localStorage.setItem(
-    CONFIG_STORAGE_KEY,
-    JSON.stringify({ url: url.trim(), anonKey: anonKey.trim() })
-  );
-  initClient();
+  return { url: ENV_URL, anonKey: ENV_KEY, isConfigured };
 }
 
 let supabaseClient: any = null;
