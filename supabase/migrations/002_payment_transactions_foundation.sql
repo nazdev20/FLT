@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS "FLT".transactions (
     amount NUMERIC(12,2) NOT NULL CHECK (amount > 0),
     currency TEXT NOT NULL DEFAULT 'PHP' CHECK (currency = 'PHP'),
     provider TEXT NOT NULL DEFAULT 'manual_transfer'
-        CHECK (provider IN ('manual_transfer', 'sandbox')),
+        CHECK (provider IN ('manual_transfer', 'sandbox', 'paymongo')),
     provider_reference TEXT,
     status TEXT NOT NULL DEFAULT 'pending'
         CHECK (status IN ('pending', 'succeeded', 'failed', 'cancelled', 'expired', 'refunded')),
@@ -96,10 +96,22 @@ BEGIN
         jsonb_build_object('source', 'bet_payment_submissions')
     )
     ON CONFLICT (payment_submission_id) DO UPDATE
-    SET status = EXCLUDED.status,
-        status_source = EXCLUDED.status_source,
+    SET status = CASE
+            WHEN "FLT".transactions.status_source IN ('provider_webhook', 'provider_api')
+                THEN "FLT".transactions.status
+            ELSE EXCLUDED.status
+        END,
+        status_source = CASE
+            WHEN "FLT".transactions.status_source IN ('provider_webhook', 'provider_api')
+                THEN "FLT".transactions.status_source
+            ELSE EXCLUDED.status_source
+        END,
         provider_reference = COALESCE(EXCLUDED.provider_reference, "FLT".transactions.provider_reference),
-        failure_reason = EXCLUDED.failure_reason,
+        failure_reason = CASE
+            WHEN "FLT".transactions.status_source IN ('provider_webhook', 'provider_api')
+                THEN "FLT".transactions.failure_reason
+            ELSE EXCLUDED.failure_reason
+        END,
         paid_at = CASE WHEN EXCLUDED.status = 'succeeded'
             THEN COALESCE("FLT".transactions.paid_at, EXCLUDED.paid_at)
             ELSE "FLT".transactions.paid_at END,
