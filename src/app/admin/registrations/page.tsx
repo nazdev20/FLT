@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { createClient } from '@supabase/supabase-js';
 
-type Application = { id: string; username: string; email: string; image_url: string | null; status: string; rejection_reason: string | null; created_at: string };
+type Application = { id: string; username: string; email: string; date_of_birth: string | null; image_url: string | null; status: string; rejection_reason: string | null; created_at: string };
 
 export default function AdminRegistrationsPage() {
   const [apps, setApps] = useState<Application[]>([]);
@@ -63,7 +63,7 @@ export default function AdminRegistrationsPage() {
       {!ready ? <p className="mt-8 text-sm text-zinc-400">Loading applications…</p> : <div className="mt-6 grid gap-4 md:grid-cols-2">
         {apps.map(app => <article key={app.id} className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
           {app.image_url ? <a href={app.image_url} target="_blank" rel="noreferrer"><img src={app.image_url} alt={`Registration proof for ${app.username}`} className="h-64 w-full object-contain bg-zinc-950" /></a> : <div className="flex h-40 items-center justify-center text-sm text-zinc-500">Image unavailable</div>}
-          <div className="space-y-3 p-5"><div><h2 className="text-xl font-bold">{app.username}</h2><p className="text-sm text-zinc-400">{app.email}</p></div><p className="text-xs text-zinc-500">Submitted {new Date(app.created_at).toLocaleString()}</p><p className="text-xs uppercase tracking-widest text-amber-400">{app.status}</p>
+          <div className="space-y-3 p-5"><div><h2 className="text-xl font-bold">{app.username}</h2><p className="text-sm text-zinc-400">{app.email}</p><p className="text-sm text-zinc-400">Date of birth: {app.date_of_birth || 'Not provided'}</p><p className="text-xs text-zinc-500">Age must be confirmed against the submitted ID before approval.</p></div><p className="text-xs text-zinc-500">Submitted {new Date(app.created_at).toLocaleString()}</p><p className="text-xs uppercase tracking-widest text-amber-400">{app.status}</p>
             {app.status === 'pending' && <div className="flex gap-3"><button disabled={!!busy} onClick={() => void decide(app, 'approve')} className="flex-1 rounded-xl bg-emerald-500 p-3 font-bold text-zinc-950 disabled:opacity-50">{busy === app.id ? 'Working…' : 'Approve'}</button><button disabled={!!busy} onClick={() => void decide(app, 'reject')} className="flex-1 rounded-xl border border-rose-700 p-3 font-bold text-rose-300 disabled:opacity-50">Decline</button></div>}
             {app.rejection_reason && <p className="text-sm text-rose-300">Reason: {app.rejection_reason}</p>}
           </div>
