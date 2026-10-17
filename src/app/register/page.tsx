@@ -31,13 +31,15 @@ export default function RegisterPage() {
     <section className="mx-auto max-w-lg rounded-3xl border border-zinc-800 bg-zinc-900 p-6 sm:p-8">
       <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-400">FLT • Account review</p>
       <h1 className="mt-2 text-3xl font-black">Apply for an account</h1>
-      <p className="mt-2 text-sm text-zinc-400">Your registration and image will be reviewed by an administrator. This submits an application only; it does not create an Auth account.</p>
+      <p className="mt-2 text-sm text-zinc-400">Submit your details, date of birth, and valid ID for administrator review. No Supabase Auth account is created while your application is pending.</p>
       <form className="mt-6 space-y-4" onSubmit={submit}>
-        <label className="block text-sm">Username<input name="username" required minLength={2} maxLength={60} className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-950 p-3" /></label>
+        <label className="block text-sm">Username<input name="username" required minLength={2} maxLength={60} autoComplete="username" className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-950 p-3" /></label>
         <label className="block text-sm">Email<input name="email" type="email" required autoComplete="email" className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-950 p-3" /></label>
+        <label className="block text-sm">Date of birth<input name="date_of_birth" type="date" required max={new Date().toISOString().slice(0, 10)} className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-950 p-3" /></label>
         <label className="block text-sm">Password (minimum 8 characters)<input name="password" type="password" required minLength={8} autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} className="mt-1 w-full rounded-xl border border-zinc-700 bg-zinc-950 p-3" /></label>
-        <p className="text-xs text-zinc-500">For your security, this password is not saved with the application. If approved, you can continue through the account sign-up process. This form does not create an Auth account or save your password.</p>
-        <label className="block text-sm">Registration image / proof<input name="image" type="file" required accept="image/jpeg,image/png,image/webp" className="mt-1 block w-full text-sm text-zinc-300 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-500 file:px-3 file:py-2 file:font-bold file:text-zinc-950" /></label>
+        <p className="text-xs text-zinc-500">Your password is checked for validity but is never saved in the pending application, database, or uploaded files. It is cleared after submission. If approved, you will set your password when creating your Auth account.</p>
+        <label className="block text-sm">Valid ID image<input name="image" type="file" required accept="image/jpeg,image/png,image/webp" className="mt-1 block w-full text-sm text-zinc-300 file:mr-3 file:rounded-lg file:border-0 file:bg-amber-500 file:px-3 file:py-2 file:font-bold file:text-zinc-950" /></label>
+        <p className="text-xs text-zinc-500">Accepted image formats: JPEG, PNG, or WebP, up to 5 MB. Your ID is stored privately for admin review.</p>
         {error && <p role="alert" className="rounded-xl bg-rose-950 p-3 text-sm text-rose-300">{error}</p>}
         {message && <p role="status" className="rounded-xl bg-emerald-950 p-3 text-sm text-emerald-300">{message}</p>}
         <button disabled={busy} className="w-full rounded-xl bg-amber-500 p-3 font-black text-zinc-950 disabled:opacity-50">{busy ? 'Submitting…' : 'Submit for review'}</button>
