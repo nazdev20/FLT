@@ -22,7 +22,7 @@ export async function GET(request: Request) {
   const context = await getAdmin(request);
   if (!context) return NextResponse.json({ error: 'Admin authentication required.' }, { status: 401 });
   const { data, error } = await context.admin.schema('FLT').from('registration_applications')
-    .select('id, username, email, image_path, status, rejection_reason, created_at')
+    .select('id, username, email, date_of_birth, image_path, status, rejection_reason, created_at')
     .order('created_at', { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
